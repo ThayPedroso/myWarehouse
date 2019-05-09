@@ -30,6 +30,26 @@ class Database:
         self.cur.execute("UPDATE product SET description=?, manufacturer=?, quantity=?, code=?, barCode=? WHERE id=?",(description,manufacturer,quantity,code,barCode,id))
         self.conn.commit()
 
+    def advancedSearch(self,description="",code=""):
+        counterArgs = 0
+        descriptionStr = description
+        codeStr = code
+        if description != "":
+            descriptionStr = '%'+description+'%'
+            counterArgs += 1
+        if code != "":
+            codeStr = '%'+code+'%'
+            counterArgs += 1 
+
+        if counterArgs == 0:
+            self.cur.execute("SELECT * FROM product WHERE description LIKE ?",('%'))    
+        if counterArgs == 1:
+            self.cur.execute("SELECT * FROM product WHERE description LIKE ? OR code LIKE ?",(descriptionStr,codeStr,))
+        if counterArgs == 2:
+            self.cur.execute("SELECT * FROM product WHERE description LIKE ? AND code LIKE ?",(descriptionStr,codeStr,))
+        rows=self.cur.fetchall()
+        return rows
+
     def __del__ (self):
         self.conn.close()
 
